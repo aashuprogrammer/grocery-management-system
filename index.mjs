@@ -4,7 +4,7 @@ import "./config.mjs";
 
 try {
   await mongoose.connect(process.env.DB_URL, {
-    dbName: "Grocery_Management",
+    dbName: "grocery_management",
   });
   console.log("Connected to Database");
 } catch (error) {

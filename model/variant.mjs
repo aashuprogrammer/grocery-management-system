@@ -6,11 +6,11 @@ const VariantSchema = new mongoose.Schema({
     ref: "variant_id",
     select: false,
   },
-  img: { type: String, required: true },
+  img: { type: String, required: false },
   name: { type: String, required: true },
   title: { type: String, required: true },
   discount: { type: String, required: true },
-  price: { type: Number, required: true },
+  price: { type: String, required: true },
   quantity: { type: String, required: true },
 });
 
