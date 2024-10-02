@@ -6,9 +6,11 @@ import {
   getProduct,
   updateProduct,
 } from "../controllers/productController.mjs";
+import { uploadOnCloudinary } from "../imageUploader/imageUpload.mjs";
+
 const router = express.Router();
 
-router.post("/create_product", createProduct);
+router.post("/create_product", createProduct, uploadOnCloudinary);
 router.get("/get_product", getProduct);
 router.get("/get_all_product", getAllProduct);
 router.patch("/update_product/:id", updateProduct);

@@ -1,13 +1,10 @@
 import Product from "../model/product.mjs";
 
-////////// Admin Function ////////////
 const createProduct = async (req, res) => {
   try {
     const adminCreateProduct = await Product.create({
       name: req.body.name,
       title: req.body.title,
-      price: req.body.price,
-      discount: req.body.discount,
       discription: req.body.discription,
     })
       .then((p) => {

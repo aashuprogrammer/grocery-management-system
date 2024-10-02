@@ -1,6 +1,6 @@
 import { v2 as cloudinary } from "cloudinary";
-import multer from "multer";
 import fs from "fs";
+import multer from "multer";
 
 async function uploadOnCloudinary(req, res) {
   cloudinary.config({
@@ -8,18 +8,17 @@ async function uploadOnCloudinary(req, res) {
     api_key: process.env.CLOUDINARY_API_KEY,
     api_secret: process.env.CLOUDINARY_SECRET_KEY,
   });
-
-  const i = multer({
+  const r = multer({
     storage: multer.diskStorage({
       destination: (req, file, cb) => {
-        cb(null, "imageUpload");
+        cb(null, "uploads");
       },
       filename: (req, file, cb) => {
         cb(null, file.originalname);
       },
     }),
   }).single("image");
-  i(req, res, (err) => {
+  r(req, res, (err) => {
     console.log(req.file);
     if (err) {
       console.log(err);
@@ -46,5 +45,9 @@ async function uploadOnCloudinary(req, res) {
     );
   });
 }
+function getFile(req, res) {
+  console.log(req.body);
+  res.send("Get File");
+}
 
-export default uploadOnCloudinary;
+export { uploadOnCloudinary, getFile };

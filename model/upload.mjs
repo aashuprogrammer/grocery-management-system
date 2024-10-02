@@ -5,6 +5,7 @@ const fileUploadSchema = new mongoose.Schema({
     type: String,
     require: true,
   },
+  create_at: { type: Date, default: Date.now(), required: true },
 });
 
 const uploadImage = mongoose.model("uploadImage", fileUploadSchema);
