@@ -12,6 +12,7 @@ const VariantSchema = new mongoose.Schema({
   discount: { type: String, required: true },
   price: { type: String, required: true },
   quantity: { type: String, required: true },
+  create_at: { type: Date, default: Date.now(), required: true },
 });
 
 const Variant = mongoose.model("variant", VariantSchema);
