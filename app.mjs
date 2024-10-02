@@ -4,6 +4,10 @@ import productRoutor from "./routers/productRouter.mjs";
 import variantRouter from "./routers/variantRouter.mjs";
 import cartRouter from "./routers/cartRouter.mjs";
 
+import { userRoute } from "./routers/users.mjs";
+import { categoryRoute } from "./routers/category.mjs";
+import { reviewRouter } from "./routers/review.mjs";
+
 const app = express();
 app.use(cors("*"));
 app.use(express.json());
@@ -11,6 +15,10 @@ app.use(express.json());
 app.use("/product", productRoutor);
 app.use("/variant", variantRouter);
 app.use("/cart", cartRouter);
+
+app.use("/user", userRoute);
+app.use("/category", categoryRoute);
+app.use("/review", reviewRouter);
 
 // ////////////////////////
 
