@@ -8,6 +8,7 @@ import { userRoute } from "./routers/users.mjs";
 import { categoryRoute } from "./routers/category.mjs";
 import { reviewRouter } from "./routers/review.mjs";
 import bodyParser from "body-parser";
+import { errorController } from "./error.mjs";
 
 const app = express();
 app.use(cors("*"));
@@ -30,4 +31,5 @@ app.get("/", (req, res) => {
 app.all("*", async (req, res) => {
   res.send("Route Not Exists");
 });
+app.use(errorController);
 export default app;
