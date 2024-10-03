@@ -1,5 +1,4 @@
 import { Cart } from "../model/cart.mjs";
-import Product from "../model/product.mjs";
 
 const createCart = async (req, res) => {
   try {
