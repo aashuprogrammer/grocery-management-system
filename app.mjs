@@ -8,6 +8,7 @@ import { userRoute } from "./routers/users.mjs";
 import { categoryRoute } from "./routers/category.mjs";
 import { reviewRouter } from "./routers/review.mjs";
 import { tagRoute } from "./routers/tag.mjs";
+import { ProductTagRoute } from "./routers/productTag.mjs";
 
 const app = express();
 app.use(cors("*"));
@@ -22,6 +23,7 @@ app.use("/category", categoryRoute);
 app.use("/review", reviewRouter);
 
 app.use('/tag', tagRoute);
+app.use('/product_tag', ProductTagRoute);
 
 // ////////////////////////
 
