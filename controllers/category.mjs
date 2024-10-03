@@ -1,24 +1,22 @@
 import { Category } from "../model/category.mjs";
-
-const createCategory = async (req, res) => {
-  try {
-    const category = new Category({
-      category_name: req.body.category_name,
-    });
-    await category.save();
+import { CustomError, errorCapture } from "../error.mjs";
+const createCategory = errorCapture(async (req, res, next) => {
+  const category = new Category({
+    category_name: req.body.category_name,
+  });
+  await category.save();
+  if (category) {
     res.json({ msg: "Create Category Success", category });
-  } catch (error) {
-    res.json(error);
   }
-};
+  throw new CustomError(null, 403, "category not created");
+});
 
-const getAllCategory = async (req, res) => {
-  try {
-    const category = await Category.find();
-    res.status(200).json({ msg: "Get All Category Success", category });
-  } catch (error) {
-    res.json(error);
+const getAllCategory = errorCapture(async (req, res, next) => {
+  const category = await Category.find();
+  if (category < 1) {
+    throw new CustomError(null, 404, "category is not found");
   }
-};
+  return res.json({ msg: "Get All Category Success", category });
+});
 
 export { createCategory, getAllCategory };
