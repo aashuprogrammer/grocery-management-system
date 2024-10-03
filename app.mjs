@@ -3,6 +3,7 @@ import cors from "cors";
 import productRoutor from "./routers/productRouter.mjs";
 import variantRouter from "./routers/variantRouter.mjs";
 import cartRouter from "./routers/cartRouter.mjs";
+import bodyParser from "body-parser";
 
 import { userRoute } from "./routers/users.mjs";
 import { categoryRoute } from "./routers/category.mjs";
@@ -15,6 +16,7 @@ import { ProductTagRoute } from "./routers/productTag.mjs";
 const app = express();
 app.use(cors("*"));
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use("/product", productRoutor);
 app.use("/variant", variantRouter);
