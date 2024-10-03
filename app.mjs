@@ -3,8 +3,6 @@ import cors from "cors";
 import productRoutor from "./routers/productRouter.mjs";
 import variantRouter from "./routers/variantRouter.mjs";
 import cartRouter from "./routers/cartRouter.mjs";
-import bodyParser from "body-parser";
-
 import { userRoute } from "./routers/users.mjs";
 import { categoryRoute } from "./routers/category.mjs";
 import { reviewRouter } from "./routers/review.mjs";
