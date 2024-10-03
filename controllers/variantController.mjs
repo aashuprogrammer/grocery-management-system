@@ -1,15 +1,21 @@
 import Variant from "../model/variant.mjs";
+import cloudinary from "../imageUploader/imageUpload.mjs";
 
 const createVariant = async (req, res) => {
   try {
+    const imgresult = await cloudinary.uploader.upload(req.file.path, {
+      folder: "imageUploder",
+    });
     const creVariant = await Variant.create({
       product_id: req.body.product_id,
-      img: req.body.img,
       name: req.body.name,
       title: req.body.title,
       price: req.body.price,
       discount: req.body.discount,
+      description: req.body.description,
       quantity: req.body.quantity,
+      img: imgresult.secure_url,
+      public_id: imgresult.public_id,
     })
       .then((v) => {
         res.json({
