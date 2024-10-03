@@ -15,6 +15,6 @@ userRoute.post("/signup", upload.single("image"), UserSignup);
 userRoute.post("/login", UserLogin);
 userRoute.get("/get_all_users", GetAllUser);
 userRoute.get("/profile/:id", UserProfile);
-userRoute.patch("/profile_update/:id", ProfileUpdate);
+userRoute.patch("/profile_update/:id", upload.single("image"), ProfileUpdate);
 userRoute.delete("/profile_delete/:id", ProfileDelete);
 export { userRoute };

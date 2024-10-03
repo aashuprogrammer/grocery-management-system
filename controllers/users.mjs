@@ -19,7 +19,8 @@ const UserSignup = async (req, res) => {
       password: hashPass,
       phone,
       address,
-      image: req.file.path,
+      image: result.secure_url,
+      public_id: result.public_id,
     });
     await user.save();
 
@@ -94,9 +95,31 @@ const ProfileDelete = async (req, res) => {
 
 const ProfileUpdate = async (req, res) => {
   try {
-    const user = await User.findById()
+    const user = await User.findById({ _id: req.params.id });
 
-    res.json({ msg: "User Profile Update Successfull", user });
+    if (req.file) {
+      const del = await cloudinary.uploader.destroy(user.public_id, (err) => {
+        if (err) {
+          console.log(err);
+        } else {
+          console.log("delete image successfully");
+        }
+      });
+    }
+
+    const newImg = await cloudinary.uploader.upload(req.file.path);
+
+    const data = await User.findByIdAndUpdate(
+      { _id: req.params.id },
+      {
+        name: req.body.name,
+        phone: req.body.phone,
+        address: req.body.address,
+        image: newImg.secure_url,
+        public_id: newImg.public_id,
+      }
+    ).select("-password -email -role");
+    res.json({ msg: "User Profile Update Successfull", data });
   } catch (error) {
     res.json(error);
   }

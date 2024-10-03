@@ -32,6 +32,9 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  public_id:{
+    type:String,
+  },
   created_at: {
     type: Date,
     default: Date.now(),
