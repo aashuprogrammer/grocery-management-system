@@ -8,7 +8,8 @@ const createProduct = async (req, res) => {
     const adminCreateProduct = await Product.create({
       name: req.body.name,
       title: req.body.title,
-      discription: req.body.discription,
+      description: req.body.description,
+      productTag_id: req.body.productTag_id,
       img: reuslt.secure_url,
       public_id: reuslt.public_id,
     })
@@ -55,34 +56,43 @@ const getAllProduct = async (req, res) => {
 
 const updateProduct = async (req, res) => {
   try {
-    const upProduct = await Product.findByIdAndUpdate(req.params.id);
-    const data = {
+    const product = await Product.findById(req.params.id);
+    if (!product) {
+      throw new BadRequestError("product not found");
+    }
+    let myCloud;
+    if (req.file) {
+      if (product.public_id) {
+        const { result } = await cloudinary.uploader.destroy(variant.public_id);
+        if (result !== "ok") {
+          throw new Error("Failed to delete old image.Try again later.");
+        }
+      }
+      myCloud = await cloudinary.uploader.upload(req.file.path, {
+        folder: "imageUploader",
+      });
+    }
+    const productUpdateData = {
       name: req.body.name,
       title: req.body.title,
-      img: reuslt.secure_url,
-      discription: req.body.discription,
+      description: req.body.description,
+      productTag_id: req.body.productTag_id,
     };
-    if (req.body.img !== "") {
-      const imgId = upProduct.img.public_id;
-      if (imgId) {
-        await cloudinary.uploader.destroy(imgId);
-      }
-      const newImage = await cloudinary.uploader.upload(req.body.img, {
-        folder: "imageUploder",
-        width: "1000",
-        crop: "scale",
-      });
-      data.img = {
-        public_id: newImage.public_id,
-        img: newImage.secure_url,
-      };
+    if (myCloud) {
+      productUpdateData.img = myCloud.secure_url;
+      productUpdateData.public_id = myCloud.public_id;
     }
+    const upProduct = await Product.findByIdAndUpdate(
+      req.params.id,
+      productUpdateData,
+      { new: true }
+    );
     res.json({
       upProduct: upProduct,
-      message: "Product Update",
+      message: "Product Updated",
     });
   } catch (err) {
-    res.json(err);
+    res.json({ error: err.message });
   }
 };
 
