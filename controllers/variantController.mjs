@@ -55,48 +55,20 @@ const getAllVariant = async (req, res) => {
   }
 };
 
-// const updateVariant = async (req, res) => {
-//   try {
-//     const upVariant = await Variant.findByIdAndUpdate(req.params.id, {
-//       product_id: req.body.product_id,
-//       name: req.body.name,
-//       title: req.body.title,
-//       price: req.body.price,
-//       discount: req.body.discount,
-//       description: req.body.description,
-//       quantity: req.body.quantity,
-//       img: myCloud.secure_url,
-//       public_id: myCloud.public_id,
-//     });
-//     const { result } = await cloudinary.v2.uploader.destroy(public_id);
-//     if (result === "not found")
-//       throw new BadRequestError("Please provide correct public_id");
-//     if (result !== "ok") throw new Error("Try again later.");
-//     const myCloud = await cloudinary.v2.uploader.upload(req.file.img, {
-//       public_id: req.public_id,
-//     });
-//     console.log(myCloud);
-//     res.json({
-//       upVariant: upVariant,
-//       message: "Vaniant Update",
-//     });
-//   } catch (err) {
-//     res.json(err);
-//   }
-// };
-
 const updateVariant = async (req, res) => {
   try {
     const variant = await Variant.findById(req.params.id);
     if (!variant) {
-      throw new BadRequestError("Variant not found");
+      return res.json({ error: "Variant not found" });
     }
 
     let myCloud;
     if (req.file) {
       // Delete the old image if it exists
-      if (variant.public_id) {
-        const { result } = await cloudinary.uploader.destroy(variant.public_id);
+      if (variant?.public_id) {
+        const { result } = await cloudinary.uploader.destroy(
+          variant?.public_id
+        );
         if (result !== "ok") {
           throw new Error("Failed to delete old image. Try again later.");
         }
@@ -141,13 +113,34 @@ const updateVariant = async (req, res) => {
 
 const deleteVariant = async (req, res) => {
   try {
-    const deVariant = await Variant.findByIdAndDelete(req.params.id);
+    const variant = await Variant.findById(req.params.id);
+    if (!variant) {
+      return res.status(404).json({ error: "Variant not found" });
+    }
+
+    // Delete the image from Cloudinary if it exists
+    if (variant.public_id) {
+      const { result } = await cloudinary.uploader.destroy(variant.public_id);
+      if (result !== "ok") {
+        console.error("Failed to delete image from Cloudinary:", result);
+        // Optionally, you can choose to throw an error here if you want to prevent
+        // the variant from being deleted when the image deletion fails
+        // throw new Error("Failed to delete image from Cloudinary");
+      }
+    }
+
+    // Delete the variant from the database
+    await variant.deleteOne();
+
     res.json({
-      deVariant: deVariant,
-      message: "Delete variant",
+      deletedVariant: variant,
+      message: "Variant deleted successfully",
     });
   } catch (err) {
-    res.json(err);
+    console.error("Error in deleteVariant:", err);
+    res
+      .status(500)
+      .json({ error: "Failed to delete variant", details: err.message });
   }
 };
 export {

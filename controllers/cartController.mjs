@@ -21,13 +21,29 @@ const createCart = async (req, res) => {
   }
 };
 
+// const getMyCartItem = async (req, res) => {
+//   try {
+//     const getItem = await Cart.find({ variant_id: req.body.variant_id })
+//       .select("+variant_id")
+//       .populate("variant_id");
+//     res.json({
+//       getItem: getItem,
+//       message: "Get My Cart Item",
+//     });
+//   } catch (err) {
+//     res.json(err);
+//   }
+// };
+
 const getMyCartItem = async (req, res) => {
   try {
-    // const getItem = await Cart.find({ product_id: req.body.product_id })
-    const getItem = await Cart.aggregate({ variant_id: req.body.variant_id })
-
+    const getItem = await Cart.find({ variant_id: req.body.variant_id })
       .select("+variant_id")
-      .populate("variant_id");
+      .populate({
+        path: "variant_id",
+        options: { cursor: true },
+      });
+
     res.json({
       getItem: getItem,
       message: "Get My Cart Item",
@@ -36,5 +52,4 @@ const getMyCartItem = async (req, res) => {
     res.json(err);
   }
 };
-
 export { createCart, getMyCartItem };
