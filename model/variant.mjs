@@ -13,6 +13,7 @@ const VariantSchema = new mongoose.Schema({
   price: { type: Number, required: true },
   description: { type: String, required: true },
   quantity: { type: String, required: true },
+  public_id: { type: String, require: true },
   create_at: { type: Date, default: Date.now(), required: true },
 });
 

@@ -8,7 +8,8 @@ const createProduct = async (req, res) => {
     const adminCreateProduct = await Product.create({
       name: req.body.name,
       title: req.body.title,
-      discription: req.body.discription,
+      description: req.body.description,
+      productTag_id: req.body.productTag_id,
       img: reuslt.secure_url,
       public_id: reuslt.public_id,
     })
@@ -55,49 +56,112 @@ const getAllProduct = async (req, res) => {
 
 const updateProduct = async (req, res) => {
   try {
-    const upProduct = await Product.findByIdAndUpdate(req.params.id);
-    const data = {
+    const product = await Product.findById(req.params.id);
+    if (!product) {
+      return res.json({ error: "Product not found" });
+    }
+
+    let myCloud;
+    if (req.file) {
+      // Delete the old image if it exists
+      if (product.public_id) {
+        const { result } = await cloudinary.uploader.destroy(product.public_id);
+        if (result !== "ok") {
+          throw new Error("Failed to delete old image. Try again later.");
+        }
+      }
+
+      // Upload the new image
+      myCloud = await cloudinary.uploader.upload(req.file.path, {
+        folder: "imageUploader",
+      });
+    }
+
+    const productUpdateData = {
       name: req.body.name,
       title: req.body.title,
-      img: reuslt.secure_url,
-      discription: req.body.discription,
+      description: req.body.description,
     };
-    if (req.body.img !== "") {
-      const imgId = upProduct.img.public_id;
-      if (imgId) {
-        await cloudinary.uploader.destroy(imgId);
-      }
-      const newImage = await cloudinary.uploader.upload(req.body.img, {
-        folder: "imageUploder",
-        width: "1000",
-        crop: "scale",
-      });
-      data.img = {
-        public_id: newImage.public_id,
-        img: newImage.secure_url,
-      };
+
+    // Only update image fields if a new image was uploaded
+    if (myCloud) {
+      productUpdateData.img = myCloud.secure_url;
+      productUpdateData.public_id = myCloud.public_id;
     }
+
+    const upProduct = await Product.findByIdAndUpdate(
+      req.params.id,
+      productUpdateData,
+      { new: true }
+    );
+
     res.json({
       upProduct: upProduct,
-      message: "Product Update",
+      message: "Product Updated",
     });
   } catch (err) {
-    res.json(err);
+    res.json({ error: err.message });
   }
 };
 
+// const deleteProduct = async (req, res) => {
+//   try {
+//     const deProduct = await Product.findById(req.params.id);
+
+//     if (!deProduct) {
+//       return res.json({ error: "Product not found" });
+//     }
+
+//     // Delete image from Cloudinary if it exists
+//     if (deProduct.public_id) {
+//       const result = await cloudinary.uploader.destroy(deProduct.public_id);
+//       if (result.result !== "ok") {
+//         throw new Error("Failed to delete image from Cloudinary");
+//       }
+//     }
+
+//     // Delete the product from the database
+//     await Product.findByIdAndDelete(req.params.id);
+
+//     res.json({
+//       message: "Product and associated image deleted successfully",
+//     });
+//   } catch (err) {
+//     console.error("Error deleting product:", err);
+//     res.json({ error: err.message });
+//   }
+// };
 const deleteProduct = async (req, res) => {
   try {
-    const deProduct = await Product.findByIdAndDelete(req.params.id);
-    cloudinary.uploader.destroy(imageName, (err, reuslt) => {
-      console.log(err, reuslt);
-    });
-    res.json({
-      deProduct: deProduct,
-      message: "Product Deleted",
+    const product = await Product.findById(req.params.id);
+
+    if (!product) {
+      return res.status(404).json({ error: "Product not found" });
+    }
+
+    // Delete image from Cloudinary if it exists
+    if (product.public_id) {
+      const { result } = await cloudinary.uploader.destroy(product.public_id);
+      if (result !== "ok") {
+        console.error("Failed to delete image from Cloudinary:", result);
+        // Optionally, you can choose to throw an error here if you want to prevent
+        // the product from being deleted when the image deletion fails
+        // throw new Error("Failed to delete image from Cloudinary");
+      }
+    }
+
+    // Delete the product from the database
+    await product.deleteOne();
+
+    res.status(200).json({
+      message: "Product and associated image deleted successfully",
+      deletedProduct: product,
     });
   } catch (err) {
-    res.json(err);
+    console.error("Error in deleteProduct:", err);
+    res
+      .status(500)
+      .json({ error: "Failed to delete product", details: err.message });
   }
 };
 
