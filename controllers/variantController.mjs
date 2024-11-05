@@ -1,8 +1,10 @@
 import Variant from "../model/variant.mjs";
 import cloudinary from "../imageUploader/imageUpload.mjs";
+import { CustomError } from "../error.mjs";
 
-const createVariant = async (req, res) => {
+const createVariant = async (req, res, next) => {
   try {
+    throw new CustomError(new Error("test"), 404, "msg test");
     const imgresult = await cloudinary.uploader.upload(req.file.path, {
       folder: "imageUploder",
     });
@@ -16,18 +18,13 @@ const createVariant = async (req, res) => {
       quantity: req.body.quantity,
       img: imgresult.secure_url,
       public_id: imgresult.public_id,
-    })
-      .then((v) => {
-        res.json({
-          creVariant: v,
-          message: "Create Variant",
-        });
-      })
-      .catch((err) => {
-        return res.json(err);
-      });
+    });
+    res.json({
+      creVariant,
+      message: "Create Variant",
+    });
   } catch (err) {
-    res.json(err);
+    next(err);
   }
 };
 

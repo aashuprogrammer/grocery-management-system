@@ -9,10 +9,12 @@ const errorCapture = (fun) => {
 };
 
 const errorController = (err, req, res, next) => {
+  console.log("------------------------");
   console.log(err);
+  console.log("------------------------");
   res.statusCode = err.statusCode ? err.statusCode : 500;
   console.log(process.env.NODE_ENV);
-  if (process.env.NODE_ENV === "developmen") {
+  if (process.env.NODE_ENV === "development") {
     return res.json({
       devError: err.message,
       error: err.productionMessage,
