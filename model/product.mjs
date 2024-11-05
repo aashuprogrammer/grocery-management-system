@@ -6,6 +6,7 @@ const ProductSchema = new mongoose.Schema({
   title: { type: String, required: true },
   description: { type: String, required: true },
   public_id: { type: String, required: true },
+  category_id:{type: String,require: true},
   create_at: { type: Date, default: Date.now(), required: true },
 });
 
