@@ -60,7 +60,7 @@ const UserLogin = errorCapture(async (req, res, next) => {
 
 const GetAllUser = errorCapture(async (req, res) => {
   const user = await User.find().select("-password");
-  if (!user) {
+  if (!(user.length > 0)) {
     throw new CustomError(null, 404, "user not found");
   }
   res.send({ msg: "Get All User Success", user });
