@@ -13,9 +13,9 @@ try {
 console.log("hello");
 
 const db = mongoose.connection;
-db.on("error", (error) => console.error(error));
+db.on("error", (error) => console.error("MongoDB Connection error:", error));
 
-(async () => {  
+(async () => {
   try {
     app.listen(process.env.PORT);
     console.log(`listen on port:${process.env.PORT}`);
